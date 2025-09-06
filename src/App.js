@@ -2799,9 +2799,10 @@ const availablePS = availablePSStations.length;
       setCurrentQrEntry(entry);
       setQrCodeData(qrToken); // Store only the token for QR Canvas
       // Construct the full URL here for sharing
-      if (serverInfo) {
-        setRedemptionFullUrl(`http://${serverInfo.ip}:${serverInfo.port}/redeem?token=${qrToken}`);
-    }
+      const renderServerUrl = "https://fun4youqr.onrender.com"; // <-- Replace with your actual Render URL
+	  const redemptionUrl = `${renderServerUrl}/redeem-prompt?token=${qrToken}`;
+
+	  setRedemptionFullUrl(redemptionUrl);
       setShowQrModal(true);
     } catch (e) {
       console.error("Error generating QR code:", e);
@@ -2809,44 +2810,6 @@ const availablePS = availablePSStations.length;
     }
   };
 
-// Add this new useEffect hook to your App.js, ideally at the top of the component
-useEffect(() => {
-    fetch("https://fun4youqr.onrender.com/server-info")
-        .then((res) => res.json())
-        .then((data) => setServerInfo(data))
-        .catch((err) => console.error("Failed to fetch server info", err));
-
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get('token');
-
-  if (token && serverInfo) {
-    console.log("Found token in URL. Attempting to redeem...");
-    const redeemVoucher = async () => {
-      try {
-        const redemptionUrl = `http://${serverInfo.ip}:${serverInfo.port}/redeem?token=${token}`;
-        const response = await fetch(redemptionUrl);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Redemption failed with an unknown error.');
-        }
-
-        const data = await response.json();
-        if (data.success) {
-          alert(`Redemption Successful! Message: ${data.message}. Voucher data: ${JSON.stringify(data.data)}`);
-        } else {
-          throw new Error(data.message || 'Redemption failed.');
-        }
-
-      } catch (error) {
-        console.error("Redemption error:", error);
-        alert(`Redemption Failed: ${error.message}`);
-      }
-    };
-
-    redeemVoucher();
-  }
-}, [serverInfo]);
 
 
   // NEW: QR Code Implementation - Function to copy redemption URL to clipboard
