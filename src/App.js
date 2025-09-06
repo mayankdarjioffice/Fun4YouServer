@@ -1570,7 +1570,7 @@ const availablePS = availablePSStations.length;
 
 		setQrCodeData(redemptionToken);
 		if (serverInfo) {
-            const renderServerUrl = "https://your-server-name.onrender.com"; // Replace with your actual Render URL
+            const renderServerUrl = "https://fun4youqr.onrender.com"; // Replace with your actual Render URL
 			setRedemptionFullUrl(`${renderServerUrl}/redeem?token=${redemptionToken}`);
         }
 
