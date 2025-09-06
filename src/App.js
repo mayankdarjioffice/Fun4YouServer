@@ -1570,7 +1570,7 @@ const availablePS = availablePSStations.length;
 
 		setQrCodeData(redemptionToken);
 		if (serverInfo) {
-            const renderServerUrl = "https://fun4youqr.onrender.com"; // Replace with your actual Render URL
+            const renderServerUrl = "https://your-server-name.onrender.com"; // Replace with your actual Render URL
 			setRedemptionFullUrl(`${renderServerUrl}/redeem?token=${redemptionToken}`);
         }
 
@@ -3375,7 +3375,7 @@ const availablePS = availablePSStations.length;
                 </div>
 				</div>
 				<div className="order-3 md:order-none flex flex-col items-center">
-                <div className="w-full sm:max-w-sm"> {/* Added wrapper to limit input width and relative for suggestions */}
+                <div className="w-full sm:max-w-sm relative"> {/* Added wrapper to limit input width and relative for suggestions */}
                   <label htmlFor="name" className={`block text-sm font-medium mb-1 text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name</label>
                   <input
                     type="text"
@@ -3551,7 +3551,7 @@ const availablePS = availablePSStations.length;
                 </div>
 				</div>
 				<div className="order-8 md:order-none flex flex-col items-center">
-                <div className="w-full sm:max-w-sm"> {/* Added wrapper to limit input width */}
+                <div className="w-full sm:max-w-sm relative"> {/* Added wrapper to limit input width */}
                   <label htmlFor="entryTime" className={`block text-sm font-medium mb-1 text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Entry Time</label>
                   <input
                     type="time"
@@ -4071,7 +4071,7 @@ const availablePS = availablePSStations.length;
             <form onSubmit={handleAddAdvanceBooking} className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               {/* Main Booking Fields with Vertical Separator */}
               <div className="order-1 md:order-none flex flex-col items-center">
-                  <div className="w-full sm:max-w-sm"> {/* Added wrapper to limit input width and relative for suggestions */}
+                  <div className="w-full sm:max-w-sm relative"> {/* Added wrapper to limit input width and relative for suggestions */}
                     <label htmlFor="advanceBookingName" className={`block text-sm font-medium mb-1 text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name</label>
                     <input
                       type="text"
@@ -4102,7 +4102,7 @@ const availablePS = availablePSStations.length;
                   </div>
 				  </div>
                 <div className="order-2 md:order-none flex flex-col items-center">
-                  <div className="w-full sm:max-w-sm"> {/* Added wrapper to limit input width and relative for suggestions */}
+                  <div className="w-full sm:max-w-sm relative"> {/* Added wrapper to limit input width and relative for suggestions */}
                     <label htmlFor="advanceBookingMobile" className={`block text-sm font-medium mb-1 text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Mobile Number</label>
                     <input
                       type="tel"
@@ -4187,7 +4187,7 @@ const availablePS = availablePSStations.length;
                   </div>
 				  </div>				   
 				  <div className="order-6 md:order-none flex flex-col items-center">
-				  <div className="w-full sm:max-w-sm"> {/* Date for Booking */}
+				  <div className="w-full sm:max-w-sm relative"> {/* Date for Booking */}
                     <label htmlFor="bookingDate" className={`block text-sm font-medium mb-1 text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Booking Date</label>
                     <input
                       type="date"
