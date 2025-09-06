@@ -11,7 +11,7 @@ const localIp = ip.address();
 app.use(cors());
 
 // --- Firebase Admin SDK Initialization ---
-const serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS_JSON);
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
