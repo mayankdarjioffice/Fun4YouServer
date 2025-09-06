@@ -2801,7 +2801,7 @@ const availablePS = availablePSStations.length;
       // Construct the full URL here for sharing
       const renderServerUrl = "https://fun4youqr.onrender.com"; // <-- Replace with your actual Render URL
 
-	  setRedemptionFullUrl(`${renderServerUrl}/redeem?token=${qrToken}`);
+	  setRedemptionFullUrl(`${renderServerUrl}/verify-redeem?token=${qrToken}`);
 
       setShowQrModal(true);
     } catch (e) {
