@@ -1570,7 +1570,8 @@ const availablePS = availablePSStations.length;
 
 		setQrCodeData(redemptionToken);
 		if (serverInfo) {
-            setRedemptionFullUrl(`http://${serverInfo.ip}:${serverInfo.port}/redeem?token=${redemptionToken}`);
+            const renderServerUrl = "https://fun4youqr.onrender.com"; // Replace with your actual Render URL
+			setRedemptionFullUrl(`${renderServerUrl}/redeem?token=${redemptionToken}`);
         }
 
       if (gamingOption === 'Custom Price') {
@@ -2810,7 +2811,7 @@ const availablePS = availablePSStations.length;
 
 // Add this new useEffect hook to your App.js, ideally at the top of the component
 useEffect(() => {
-    fetch("http://localhost:3001/server-info")
+    fetch("https://fun4youqr.onrender.com/server-info")
         .then((res) => res.json())
         .then((data) => setServerInfo(data))
         .catch((err) => console.error("Failed to fetch server info", err));

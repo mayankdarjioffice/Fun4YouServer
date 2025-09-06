@@ -1,12 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const ip = require('ip');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3001;
-const localIp = ip.address();
 
 app.use(cors());
 
@@ -294,12 +292,6 @@ app.get('/redeem', async (req, res) => {
     }
 });
 
-app.get("/server-info", (req, res) => {
-    res.json({ ip: ip.address(), port });
+app.listen(port, () => {
+    console.log(`Redemption server listening on port ${port}`);
 });
-
-app.listen(port, '0.0.0.0', () => {
-    console.log(`Redemption server listening at http://${ip.address()}:${port}`);
-});
-
-module.exports = { localIp, port };
