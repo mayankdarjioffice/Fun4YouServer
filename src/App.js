@@ -2800,9 +2800,9 @@ const availablePS = availablePSStations.length;
       setQrCodeData(qrToken); // Store only the token for QR Canvas
       // Construct the full URL here for sharing
       const renderServerUrl = "https://fun4youqr.onrender.com"; // <-- Replace with your actual Render URL
-	  const redemptionUrl = `${renderServerUrl}/redeem-prompt?token=${qrToken}`;
 
-	  setRedemptionFullUrl(redemptionUrl);
+	  setRedemptionFullUrl(`${renderServerUrl}/redeem?token=${qrToken}`);
+
       setShowQrModal(true);
     } catch (e) {
       console.error("Error generating QR code:", e);
