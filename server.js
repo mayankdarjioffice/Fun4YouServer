@@ -22,11 +22,11 @@ const db = admin.firestore();
 
 
 /**
- * Generates a themed (Light/Dark), ticket-like HTML page for the mobile device.
+ * Generates a themed (Light/Dark) HTML page with a conditional style.
  * @param {string} status - The status type ('success', 'warning', 'error', 'password')
  * @param {string} title - The main title of the message.
  * @param {string} message - A descriptive message.
- * @param {object|null} details - An object with details to display (e.g., { Player: 'John', 'Redeemed On': '27 Aug 2025' })
+ * @param {object|null} details - An object with details to display.
  * @param {string} token - The redemption token, needed for the password form.
  * @returns {string} A full HTML page as a string.
  */
@@ -61,6 +61,15 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
         </form>
     `;
 
+    // Conditional styling and structure based on status
+    const isPasswordPage = status === 'password';
+    
+    // Select correct card class and button text based on status
+    const cardClass = isPasswordPage ? 'card' : 'ticket';
+    const headerClass = isPasswordPage ? 'card-header' : 'ticket-header';
+    const bodyClass = isPasswordPage ? 'card-body' : '';
+    const buttonText = isPasswordPage ? 'Unlock' : 'Done';
+
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -76,11 +85,12 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --success-color: #28a745;
                 --warning-color: #ffc107;
                 --error-color: #dc3545;
-                --password-color: #6a0dad;
+                --password-color: #8b5cf6;
 
                 /* Light Mode Default Theme */
                 --page-bg: #f0f2f5;
                 --ticket-bg: #ffffff;
+                --card-bg: #ffffff;
                 --text-primary: #222222;
                 --text-secondary: #555555;
                 --details-bg: #f9f9f9;
@@ -94,6 +104,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 :root {
                     --page-bg: #121212;
                     --ticket-bg: #1e1e1e;
+                    --card-bg: #1f2937;
                     --text-primary: #e0e0e0;
                     --text-secondary: #a0a0a0;
                     --details-bg: #2c2c2e;
@@ -116,8 +127,9 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             body.success { --primary-color: var(--success-color); }
             body.warning { --primary-color: var(--warning-color); }
             body.error   { --primary-color: var(--error-color); }
-            body.password { --primary-color: #6a0dad; }
+            body.password { --primary-color: var(--password-color); }
 
+            /* --- TICKET STYLE (for status pages) --- */
             .ticket {
                 background: var(--ticket-bg);
                 width: 350px;
@@ -129,11 +141,6 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 position: relative;
                 animation: slide-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
             }
-            @keyframes slide-in {
-                0% { transform: translateY(50px); opacity: 0; }
-                100% { transform: translateY(0); opacity: 1; }
-            }
-
             .ticket::before, .ticket::after {
                 content: '';
                 position: absolute;
@@ -152,7 +159,35 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 padding-bottom: 20px;
                 margin-bottom: 20px;
             }
+            
+            /* --- CARD STYLE (for password page) --- */
+            .card {
+                background: var(--card-bg);
+                width: 350px;
+                max-width: 90%;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px var(--shadow-color);
+                text-align: center;
+                animation: slide-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+            }
+            .card-header {
+                background: var(--primary-color);
+                color: white;
+                padding: 30px 25px;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+            }
+            .card-body {
+                padding: 25px;
+                color: var(--text-primary);
+            }
 
+            /* --- COMMON STYLES --- */
+            @keyframes slide-in {
+                0% { transform: translateY(50px); opacity: 0; }
+                100% { transform: translateY(0); opacity: 1; }
+            }
+            
             .icon {
                 width: 80px;
                 height: 80px;
@@ -173,17 +208,19 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
             @keyframes draw-cross { to { opacity: 1; } }
 
+            .card-header .icon, .card-header .title, .card-header .message { stroke: white; color: white; }
             .title {
                 font-size: 26px;
                 font-weight: 800;
-                color: var(--text-primary);
                 margin: 0;
             }
             .message {
                 font-size: 16px;
-                color: var(--text-secondary);
                 margin-top: 8px;
             }
+            .ticket-header .title { color: var(--text-primary); }
+            .ticket-header .message { color: var(--text-secondary); }
+
             .player-name {
                 font-size: 22px;
                 font-weight: 600;
@@ -202,6 +239,10 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 margin: 8px 0;
                 display: flex;
                 justify-content: space-between;
+            }
+            .details strong {
+                font-weight: 600;
+                color: var(--text-primary);
             }
             .details span {
                 font-weight: 600;
@@ -253,7 +294,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             .password-form input:focus {
                 outline: none;
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.3); /* a translucent purple ring */
+                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); /* a translucent purple ring */
             }
             .password-form button {
                 width: 100%;
@@ -269,20 +310,33 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             }
             .password-form button:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(106, 13, 173, 0.3);
+                box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
             }
         </style>
     </head>
     <body class="${status}">
+        ${isPasswordPage ? `
+        <div class="card">
+            <div class="card-header">
+                ${icons[status] || ''}
+                <h1 class="title">${title}</h1>
+                <p class="message">${message}</p>
+            </div>
+            <div class="card-body">
+                ${passwordForm}
+            </div>
+        </div>
+        ` : `
         <div class="ticket">
             <div class="ticket-header">
                 ${icons[status] || ''}
                 <h1 class="title">${title}</h1>
                 <p class="message">${message}</p>
             </div>
-            ${status === 'password' ? passwordForm : detailsHtml}
-            ${status !== 'password' ? '<button class="done-button" onclick="window.close();">Done</button>' : ''}
+            ${detailsHtml}
+            <button class="done-button" onclick="window.close();">Done</button>
         </div>
+        `}
     </body>
     </html>
     `;
@@ -294,7 +348,7 @@ app.get('/redeem', async (req, res) => {
         return res.status(400).send(generateHtmlResponse('error', 'Error', 'No token was provided.'));
     }
     // Present the password form on initial GET request
-    return res.send(generateHtmlResponse('password', 'Enter Admin Password', 'Please enter the admin password to view voucher details.', null, token));
+    return res.send(generateHtmlResponse('password', 'Admin Access', 'Enter the admin password to continue.', null, token));
 });
 
 app.post('/redeem', async (req, res) => {
