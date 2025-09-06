@@ -349,7 +349,7 @@ app.get('/redeem', async (req, res) => {
         return res.status(400).send(generateHtmlResponse('error', 'Error', 'No token was provided.'));
     }
     // Present the password form on initial GET request
-    return res.send(generateHtmlResponse('password', 'Admin Access', 'Enter the admin password to continue.', null, token));
+    return res.send(generateHtmlResponse('password', 'Admin Access', 'Enter the password to redeem voucher details.', null, token));
 });
 
 app.post('/redeem', async (req, res) => {
