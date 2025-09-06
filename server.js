@@ -96,7 +96,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --details-text-strong: #000000;
                 --border-color: #e0e0e0;
                 --shadow-color: rgba(0, 0, 0, 0.12);
-                --password-color: #3b82f6; /* Blue for password page */
+                --password-color: #f97316; /* orange for password page */
             }
 
             /* Dark Mode Theme via Media Query */
@@ -111,7 +111,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                     --details-text-strong: #ffffff;
                     --border-color: #444444;
                     --shadow-color: rgba(0, 0, 0, 0.4);
-                    --password-color: #f97316; /* Orange for password page */
+                    --password-color: #3b82f6; /* blue for password page */
                 }
             }
             
