@@ -85,7 +85,6 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --success-color: #28a745;
                 --warning-color: #ffc107;
                 --error-color: #dc3545;
-                --password-color: #8b5cf6;
 
                 /* Light Mode Default Theme */
                 --page-bg: #f0f2f5;
@@ -97,6 +96,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --details-text-strong: #000000;
                 --border-color: #e0e0e0;
                 --shadow-color: rgba(0, 0, 0, 0.12);
+                --password-color: #3b82f6; /* Blue for password page */
             }
 
             /* Dark Mode Theme via Media Query */
@@ -111,6 +111,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                     --details-text-strong: #ffffff;
                     --border-color: #444444;
                     --shadow-color: rgba(0, 0, 0, 0.4);
+                    --password-color: #f97316; /* Orange for password page */
                 }
             }
             
@@ -294,7 +295,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             .password-form input:focus {
                 outline: none;
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3); /* a translucent purple ring */
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Blue ring */
             }
             .password-form button {
                 width: 100%;
@@ -310,7 +311,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             }
             .password-form button:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); /* Blue shadow */
             }
         </style>
     </head>
