@@ -116,7 +116,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             body.success { --primary-color: var(--success-color); }
             body.warning { --primary-color: var(--warning-color); }
             body.error   { --primary-color: var(--error-color); }
-            body.password { --primary-color: var(--password-color); }
+            body.password { --primary-color: #6a0dad; }
 
             .ticket {
                 background: var(--ticket-bg);
@@ -229,32 +229,47 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 transform: translateY(-2px);
                 box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             }
+
+            /* NEW: Styles for the password form */
             .password-form {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                gap: 15px;
+                gap: 20px;
+                padding: 20px 0;
             }
             .password-form input {
                 width: 100%;
-                padding: 12px;
-                border-radius: 8px;
-                border: 1px solid var(--border-color);
+                padding: 15px;
+                border-radius: 10px;
+                border: 2px solid var(--border-color);
                 background-color: var(--details-bg);
                 color: var(--text-primary);
                 text-align: center;
-                font-size: 16px;
+                font-size: 18px;
+                font-weight: 600;
+                transition: border-color 0.3s, box-shadow 0.3s;
+            }
+            .password-form input:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.3); /* a translucent purple ring */
             }
             .password-form button {
                 width: 100%;
                 padding: 15px;
                 border: none;
-                border-radius: 8px;
+                border-radius: 10px;
                 background-color: var(--primary-color);
                 color: white;
-                font-size: 16px;
-                font-weight: 600;
+                font-size: 18px;
+                font-weight: 800;
                 cursor: pointer;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .password-form button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(106, 13, 173, 0.3);
             }
         </style>
     </head>
