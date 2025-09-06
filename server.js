@@ -1,15 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
-const bodyParser = require('body-parser');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 // --- Firebase Admin SDK Initialization ---
 const serviceAccount = JSON.parse(process.env.FIREBASE_CREDENTIALS_JSON);
@@ -234,58 +231,15 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
     `;
 };
 
-app.get('/verify-redeem', (req, res) => {
+
+app.get('/redeem', async (req, res) => {
     const token = req.query.token;
     if (!token) {
-        return res.status(400).send(generateHtmlResponse('error', null, 'Error', 'No token provided.'));
+        return res.status(400).send(generateHtmlResponse('error', null, 'Error', 'No token was provided.'));
     }
 
-    const passwordFormHtml = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Enter Admin Password</title>
-            <style>
-                body { font-family: sans-serif; text-align: center; padding: 20px; }
-                .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-                input[type="password"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
-                button { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h2>Voucher Redemption</h2>
-                <p>Enter the admin password to view details.</p>
-                <form action="/redeem-final" method="post">
-                    <input type="hidden" name="token" value="${token}">
-                    <input type="password" name="password" placeholder="Admin Password" required>
-                    <button type="submit">Verify & View</button>
-                </form>
-            </div>
-        </body>
-        </html>
-    `;
-    res.send(passwordFormHtml);
-});
-
-
-app.post('/redeem-final', async (req, res) => {
-    const { token, password } = req.body;
-
-    // 1. Fetch the admin password from Firestore
-    const appId = process.env.FIREBASE_PROJECT_ID;
-    const adminPasswordDocRef = db.collection(`artifacts/${appId}/public/data/adminSettings`).doc('password');
-    const docSnap = await adminPasswordDocRef.get();
-    const adminPassword = docSnap.exists ? docSnap.data().adminPassword : null;
-
-    // 2. Check if the provided password matches
-    if (!adminPassword || password !== adminPassword) {
-        return res.status(401).send(generateHtmlResponse('error', null, 'Access Denied', 'Incorrect password.'));
-    }
-
-    // 3. If password is correct, proceed with the original redemption logic
     try {
+        const appId = process.env.FIREBASE_PROJECT_ID || 'default-app-id';
         const entriesRef = db.collection(`artifacts/${appId}/public/data/entries`);
         const snapshot = await entriesRef.where('redemptionToken', '==', token).limit(1).get();
 
@@ -296,31 +250,41 @@ app.post('/redeem-final', async (req, res) => {
         const entryDoc = snapshot.docs[0];
         const entryData = entryDoc.data();
 
-        // Check if already redeemed
-        if (entryData.isRedeemed) {
-            const originalRedemptionTime = entryData.redeemedAt.toDate();
-            const formattedTime = originalRedemptionTime.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-            const redemptionDetails = {
-                Player: entryData.name,
-                'Mobile Number': entryData.mobileNumber,
-                'Redeemed On': formattedTime
-            };
-            return res.send(generateHtmlResponse('warning', null, 'Already Redeemed', 'This voucher has already been used.', redemptionDetails));
-        } else {
-            // Perform the redemption
+        if (!entryData.isRedeemed) {
             const redemptionTime = new Date();
-            await entryDoc.ref.update({
+            
+            await entryDoc.ref.update({ 
                 isRedeemed: true,
-                redeemedAt: redemptionTime
+                redeemedAt: redemptionTime 
+            });
+            
+            const formattedTime = redemptionTime.toLocaleString('en-GB', {
+                day: 'numeric', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
             });
 
-            const formattedTime = redemptionTime.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
             const redemptionDetails = {
                 Player: entryData.name,
                 'Mobile Number': entryData.mobileNumber,
                 'Redeemed On': formattedTime
             };
+            
             return res.send(generateHtmlResponse('success', null, 'Redeemed Successfully!', 'This voucher is now valid.', redemptionDetails));
+        } else {
+            const originalRedemptionTime = entryData.redeemedAt.toDate();
+            
+            const formattedTime = originalRedemptionTime.toLocaleString('en-GB', {
+                day: 'numeric', month: 'short', year: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+
+            const redemptionDetails = {
+                Player: entryData.name,
+                'Mobile Number': entryData.mobileNumber,
+                'Redeemed On': formattedTime
+            };
+            
+            return res.send(generateHtmlResponse('warning', null, 'Already Redeemed', 'This voucher has already been used.', redemptionDetails));
         }
     } catch (error) {
         console.error('Error redeeming voucher:', error);
