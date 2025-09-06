@@ -234,34 +234,8 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
 
 app.get('/redeem', async (req, res) => {
     const token = req.query.token;
-	const redemptionPassword = req.query.password; // Get the password from the URL
-    const correctPassword = process.env.REDEMPTION_PASSWORD; // Get the correct password from .env
-
-   // First, check if a token is even present
     if (!token) {
         return res.status(400).send(generateHtmlResponse('error', null, 'Error', 'No token was provided.'));
-    }
-
-    // If no password is provided, display the form
-    if (!redemptionPassword) {
-        const redemptionUrl = `https://fun4youqr.onrender.com/redeem?token=${token}`;
-        return res.send(`
-            <!DOCTYPE html>
-            <html>
-            <body>
-                <h1>Enter Password to Redeem Voucher</h1>
-                <form action="${redemptionUrl}" method="GET">
-                    <input type="password" name="password" placeholder="Enter Password" required>
-                    <button type="submit">Redeem</button>
-                </form>
-            </body>
-            </html>
-        `);
-    }
-
-    // Now, validate the password and proceed with redemption
-    if (redemptionPassword !== correctPassword) {
-        return res.status(401).send(generateHtmlResponse('error', null, 'Unauthorized', 'Incorrect password. Redemption failed.'));
     }
 
     try {
@@ -317,7 +291,6 @@ app.get('/redeem', async (req, res) => {
         return res.status(500).send(generateHtmlResponse('error', null, 'Server Error', 'Failed to process the voucher.'));
     }
 });
-
 
 app.listen(port, () => {
     console.log(`Redemption server listening on port ${port}`);
