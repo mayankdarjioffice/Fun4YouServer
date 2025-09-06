@@ -6,6 +6,10 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 3001;
 
+// NEW: Body parser middleware to handle POST requests
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cors());
 
 // --- Firebase Admin SDK Initialization ---
@@ -19,18 +23,19 @@ const db = admin.firestore();
 
 /**
  * Generates a themed (Light/Dark), ticket-like HTML page for the mobile device.
- * @param {string} status - The status type ('success', 'warning', 'error')
- * @param {string} icon - This parameter is no longer used, as SVGs are mapped internally.
+ * @param {string} status - The status type ('success', 'warning', 'error', 'password')
  * @param {string} title - The main title of the message.
  * @param {string} message - A descriptive message.
  * @param {object|null} details - An object with details to display (e.g., { Player: 'John', 'Redeemed On': '27 Aug 2025' })
+ * @param {string} token - The redemption token, needed for the password form.
  * @returns {string} A full HTML page as a string.
  */
-const generateHtmlResponse = (status, icon, title, message, details = null) => {
+const generateHtmlResponse = (status, title, message, details = null, token = null) => {
     const icons = {
         success: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>`,
         warning: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><path class="icon__triangle" d="M26,2 L2,48 L50,48 Z" fill="none"/><line class="icon__line" x1="26" y1="20" x2="26" y2="34" stroke-linecap="round"/><line class="icon__line" x1="26" y1="40" x2="26" y2="40" stroke-linecap="round"/></svg>`,
-        error: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle_error" cx="26" cy="26" r="25" fill="none"/><path class="icon__cross_1" d="M16 16 36 36" /><path class="icon__cross_2" d="M36 16 16 36" /></svg>`
+        error: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle_error" cx="26" cy="26" r="25" fill="none"/><path class="icon__cross_1" d="M16 16 36 36" /><path class="icon__cross_2" d="M36 16 16 36" /></svg>`,
+        password: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole"><path d="M12 2C9.24 2 7 4.24 7 7v4H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3V7c0-2.76-2.24-5-5-5z"/><circle cx="12" cy="12" r="2"/></svg>`
     };
 
     let detailsHtml = '';
@@ -48,6 +53,14 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
         detailsHtml += '</div>';
     }
 
+    const passwordForm = `
+        <form action="/redeem" method="POST" class="password-form">
+            <input type="hidden" name="token" value="${token}">
+            <input type="password" name="password" placeholder="Enter Admin Password" required autofocus />
+            <button type="submit">Unlock</button>
+        </form>
+    `;
+
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -63,6 +76,7 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
                 --success-color: #28a745;
                 --warning-color: #ffc107;
                 --error-color: #dc3545;
+                --password-color: #6a0dad;
 
                 /* Light Mode Default Theme */
                 --page-bg: #f0f2f5;
@@ -102,6 +116,7 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
             body.success { --primary-color: var(--success-color); }
             body.warning { --primary-color: var(--warning-color); }
             body.error   { --primary-color: var(--error-color); }
+            body.password { --primary-color: var(--password-color); }
 
             .ticket {
                 background: var(--ticket-bg);
@@ -192,11 +207,11 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
                 font-weight: 600;
                 color: var(--details-text-strong);
             }
-			.details a {
-				color: var(--details-text-strong);
-				text-decoration: none;
-				cursor: default;
-			}
+            .details a {
+                color: var(--details-text-strong);
+                text-decoration: none;
+                cursor: default;
+            }
             .done-button {
                 margin-top: 25px;
                 width: 100%;
@@ -214,6 +229,33 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
                 transform: translateY(-2px);
                 box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             }
+            .password-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .password-form input {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                background-color: var(--details-bg);
+                color: var(--text-primary);
+                text-align: center;
+                font-size: 16px;
+            }
+            .password-form button {
+                width: 100%;
+                padding: 15px;
+                border: none;
+                border-radius: 8px;
+                background-color: var(--primary-color);
+                color: white;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body class="${status}">
@@ -223,28 +265,48 @@ const generateHtmlResponse = (status, icon, title, message, details = null) => {
                 <h1 class="title">${title}</h1>
                 <p class="message">${message}</p>
             </div>
-            ${detailsHtml}
-            <button class="done-button" onclick="window.close();">Done</button>
+            ${status === 'password' ? passwordForm : detailsHtml}
+            ${status !== 'password' ? '<button class="done-button" onclick="window.close();">Done</button>' : ''}
         </div>
     </body>
     </html>
     `;
 };
 
-
 app.get('/redeem', async (req, res) => {
     const token = req.query.token;
     if (!token) {
-        return res.status(400).send(generateHtmlResponse('error', null, 'Error', 'No token was provided.'));
+        return res.status(400).send(generateHtmlResponse('error', 'Error', 'No token was provided.'));
+    }
+    // Present the password form on initial GET request
+    return res.send(generateHtmlResponse('password', 'Enter Admin Password', 'Please enter the admin password to view voucher details.', null, token));
+});
+
+app.post('/redeem', async (req, res) => {
+    const { token, password } = req.body;
+    if (!token || !password) {
+        return res.status(400).send(generateHtmlResponse('error', 'Error', 'Invalid request. Missing token or password.'));
     }
 
     try {
         const appId = process.env.FIREBASE_PROJECT_ID || 'default-app-id';
+
+        // Fetch the stored admin password from Firestore
+        const adminPasswordDocRef = db.doc(`artifacts/${appId}/public/data/adminSettings/password`);
+        const adminPasswordDoc = await adminPasswordDocRef.get();
+        const storedAdminPassword = adminPasswordDoc.exists ? adminPasswordDoc.data().adminPassword : 'Fun4You@2025';
+
+        // Check if the provided password is correct
+        if (password !== storedAdminPassword) {
+            return res.status(401).send(generateHtmlResponse('error', 'Invalid Password', 'The password you entered is incorrect.', null, token));
+        }
+
+        // Proceed with redemption logic
         const entriesRef = db.collection(`artifacts/${appId}/public/data/entries`);
         const snapshot = await entriesRef.where('redemptionToken', '==', token).limit(1).get();
 
         if (snapshot.empty) {
-            return res.status(404).send(generateHtmlResponse('error', null, 'Not Found', 'No entry was found for this token.'));
+            return res.status(404).send(generateHtmlResponse('error', 'Not Found', 'No entry was found for this token.'));
         }
 
         const entryDoc = snapshot.docs[0];
@@ -269,7 +331,7 @@ app.get('/redeem', async (req, res) => {
                 'Redeemed On': formattedTime
             };
             
-            return res.send(generateHtmlResponse('success', null, 'Redeemed Successfully!', 'This voucher is now valid.', redemptionDetails));
+            return res.send(generateHtmlResponse('success', 'Redeemed Successfully!', 'This voucher is now valid.', redemptionDetails));
         } else {
             const originalRedemptionTime = entryData.redeemedAt.toDate();
             
@@ -284,11 +346,11 @@ app.get('/redeem', async (req, res) => {
                 'Redeemed On': formattedTime
             };
             
-            return res.send(generateHtmlResponse('warning', null, 'Already Redeemed', 'This voucher has already been used.', redemptionDetails));
+            return res.send(generateHtmlResponse('warning', 'Already Redeemed', 'This voucher has already been used.', redemptionDetails));
         }
     } catch (error) {
         console.error('Error redeeming voucher:', error);
-        return res.status(500).send(generateHtmlResponse('error', null, 'Server Error', 'Failed to process the voucher.'));
+        return res.status(500).send(generateHtmlResponse('error', 'Server Error', 'Failed to process the voucher.'));
     }
 });
 
