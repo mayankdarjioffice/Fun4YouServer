@@ -404,14 +404,14 @@ app.post('/redeem', async (req, res) => {
         const entryData = entryDoc.data();
 
         if (!entryData.isRedeemed) {
-            const now = new Date();
+            const redemptionTime = new Date();
             
             await entryDoc.ref.update({ 
                 isRedeemed: true,
-                redeemedAt: now 
+                redeemedAt: redemptionTime 
             });
             
-            const formattedTime = updatedEntryData.redeemedAt.toDate().toLocaleString('en-GB', {
+            const formattedTime = redemptionTime.toLocaleString('en-GB', {
                 day: 'numeric', month: 'short', year: 'numeric',
                 hour: '2-digit', minute: '2-digit',
 				timeZone: 'Asia/Kolkata'
@@ -429,7 +429,8 @@ app.post('/redeem', async (req, res) => {
             
             const formattedTime = originalRedemptionTime.toLocaleString('en-GB', {
                 day: 'numeric', month: 'short', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
+                hour: '2-digit', minute: '2-digit',
+				timeZone: 'Asia/Kolkata'
             });
 
             const redemptionDetails = {
