@@ -408,7 +408,7 @@ app.post('/redeem', async (req, res) => {
             
             await entryDoc.ref.update({ 
                 isRedeemed: true,
-                redeemedAt: redemptionTime 
+                redeemedAt: now 
             });
             
             const formattedTime = updatedEntryData.redeemedAt.toDate().toLocaleString('en-GB', {
