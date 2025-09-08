@@ -35,7 +35,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
         success: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>`,
         warning: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><path class="icon__triangle" d="M26,2 L2,48 L50,48 Z" fill="none"/><line class="icon__line" x1="26" y1="20" x2="26" y2="34" stroke-linecap="round"/><line class="icon__line" x1="26" y1="40" x2="26" y2="40" stroke-linecap="round"/></svg>`,
         error: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle_error" cx="26" cy="26" r="25" fill="none"/><path class="icon__cross_1" d="M16 16 36 36" /><path class="icon__cross_2" d="M36 16 16 36" /></svg>`,
-        password: `<svg class="icon password-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole"><path d="M12 2C9.24 2 7 4.24 7 7v4H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3V7c0-2.76-2.24-5-5-5z"/><circle cx="12" cy="12" r="2"/></svg>`
+        password: `<svg class="icon password-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M17 11V7c0-2.76-2.24-5-5-5S7 4.24 7 7v4H4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V11h-3zm-5-3c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1z"/></svg>`
     };
 
     let detailsHtml = '';
@@ -404,18 +404,17 @@ app.post('/redeem', async (req, res) => {
         const entryData = entryDoc.data();
 
         if (!entryData.isRedeemed) {
-            const redemptionTime = admin.firestore.FieldValue.serverTimestamp();
+            const now = new Date();
             
             await entryDoc.ref.update({ 
                 isRedeemed: true,
                 redeemedAt: redemptionTime 
             });
             
-            const updatedEntryDoc = await entryDoc.ref.get();
-            const updatedEntryData = updatedEntryDoc.data();
             const formattedTime = updatedEntryData.redeemedAt.toDate().toLocaleString('en-GB', {
                 day: 'numeric', month: 'short', year: 'numeric',
-                hour: '2-digit', minute: '2-digit'
+                hour: '2-digit', minute: '2-digit',
+				timeZone: 'Asia/Kolkata'
             });
 
             const redemptionDetails = {
