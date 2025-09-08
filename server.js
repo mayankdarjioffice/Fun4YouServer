@@ -97,11 +97,11 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --details-text-strong: #000000;
                 --border-color: #e0e0e0;
                 --shadow-color: rgba(0, 0, 0, 0.12);
-                --password-color: #f97316; /* orange for password page */
-                --password-color-dark: #f59e0b; /* darker orange */
-                --password-icon-glow: rgba(249, 115, 22, 0.4);
-                --password-border-glow: rgba(249, 115, 22, 0.8);
-            }
+                --password-color: #0077c2; /* orange for password page */
+                --password-color-dark: #005f9c; /* darker orange */
+				--password-icon-glow: rgba(0, 119, 194, 0.4);
+                --password-border-glow: rgba(0, 119, 194, 0.8);
+				}
 
             /* Dark Mode Theme via Media Query */
             @media (prefers-color-scheme: dark) {
