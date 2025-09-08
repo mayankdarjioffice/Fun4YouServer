@@ -35,7 +35,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
         success: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle" cx="26" cy="26" r="25" fill="none"/><path class="icon__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>`,
         warning: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><path class="icon__triangle" d="M26,2 L2,48 L50,48 Z" fill="none"/><line class="icon__line" x1="26" y1="20" x2="26" y2="34" stroke-linecap="round"/><line class="icon__line" x1="26" y1="40" x2="26" y2="40" stroke-linecap="round"/></svg>`,
         error: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="icon__circle_error" cx="26" cy="26" r="25" fill="none"/><path class="icon__cross_1" d="M16 16 36 36" /><path class="icon__cross_2" d="M36 16 16 36" /></svg>`,
-        password: `<svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole"><path d="M12 2C9.24 2 7 4.24 7 7v4H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3V7c0-2.76-2.24-5-5-5z"/><circle cx="12" cy="12" r="2"/></svg>`
+        password: `<svg class="icon password-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-keyhole"><path d="M12 2C9.24 2 7 4.24 7 7v4H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3V7c0-2.76-2.24-5-5-5z"/><circle cx="12" cy="12" r="2"/></svg>`
     };
 
     let detailsHtml = '';
@@ -79,7 +79,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
         <title>Voucher Status</title>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-            
+
             /* --- THEME IMPLEMENTATION --- */
             :root {
                 --success-color: #28a745;
@@ -87,9 +87,10 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --error-color: #dc3545;
 
                 /* Light Mode Default Theme */
-                --page-bg: #f0f2f5;
+                --page-bg-start: #ffffff;
+                --page-bg-end: #e0e0e0;
                 --ticket-bg: #ffffff;
-                --card-bg: #ffffff;
+                --card-bg: rgba(255, 255, 255, 0.4);
                 --text-primary: #222222;
                 --text-secondary: #555555;
                 --details-bg: #f9f9f9;
@@ -97,24 +98,31 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 --border-color: #e0e0e0;
                 --shadow-color: rgba(0, 0, 0, 0.12);
                 --password-color: #f97316; /* orange for password page */
+                --password-color-dark: #f59e0b; /* darker orange */
+                --password-icon-glow: rgba(249, 115, 22, 0.4);
+                --password-border-glow: rgba(249, 115, 22, 0.8);
             }
 
             /* Dark Mode Theme via Media Query */
             @media (prefers-color-scheme: dark) {
                 :root {
-                    --page-bg: #121212;
+                    --page-bg-start: #1e1e1e;
+                    --page-bg-end: #0a0a0a;
                     --ticket-bg: #1e1e1e;
-                    --card-bg: #1f2937;
+                    --card-bg: rgba(31, 41, 55, 0.6); /* Semi-transparent for glassmorphism */
                     --text-primary: #e0e0e0;
                     --text-secondary: #a0a0a0;
                     --details-bg: #2c2c2e;
                     --details-text-strong: #ffffff;
                     --border-color: #444444;
                     --shadow-color: rgba(0, 0, 0, 0.4);
-                    --password-color: #3b82f6; /* blue for password page */
+                    --password-color: #a78bfa; /* purple for password page */
+                    --password-color-dark: #8b5cf6; /* darker purple */
+                    --password-icon-glow: rgba(167, 139, 250, 0.6);
+                    --password-border-glow: rgba(167, 139, 250, 0.9);
                 }
             }
-            
+
             body {
                 font-family: 'Inter', sans-serif;
                 display: flex;
@@ -122,8 +130,8 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 align-items: center;
                 height: 100vh;
                 margin: 0;
-                background-color: var(--page-bg);
-                transition: background-color 0.3s ease;
+                background: linear-gradient(135deg, var(--page-bg-start) 0%, var(--page-bg-end) 100%);
+                transition: background 0.3s ease;
             }
             body.success { --primary-color: var(--success-color); }
             body.warning { --primary-color: var(--warning-color); }
@@ -147,7 +155,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 position: absolute;
                 width: 30px;
                 height: 30px;
-                background: var(--page-bg);
+                background: var(--page-bg-start); /* Match background for seamless look */
                 border-radius: 50%;
                 top: 50%;
                 transform: translateY(-50%);
@@ -160,35 +168,40 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
                 padding-bottom: 20px;
                 margin-bottom: 20px;
             }
-            
+
             /* --- CARD STYLE (for password page) --- */
             .card {
                 background: var(--card-bg);
                 width: 350px;
                 max-width: 90%;
-                border-radius: 12px;
+                border-radius: 20px;
+                border: 2px solid var(--password-border-glow);
                 box-shadow: 0 10px 30px var(--shadow-color);
                 text-align: center;
-                animation: slide-in 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+                animation: glass-in 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
             }
+            
             .card-header {
-                background: var(--primary-color);
-                color: white;
+                background: transparent;
                 padding: 30px 25px;
-                border-top-left-radius: 12px;
-                border-top-right-radius: 12px;
             }
             .card-body {
                 padding: 25px;
                 color: var(--text-primary);
             }
-
+            
             /* --- COMMON STYLES --- */
             @keyframes slide-in {
                 0% { transform: translateY(50px); opacity: 0; }
                 100% { transform: translateY(0); opacity: 1; }
             }
-            
+            @keyframes glass-in {
+                0% { transform: translateY(50px) scale(0.9); opacity: 0; }
+                100% { transform: translateY(0) scale(1); opacity: 1; }
+            }
+
             .icon {
                 width: 80px;
                 height: 80px;
@@ -208,8 +221,11 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             @keyframes stroke { 100% { stroke-dashoffset: 0; } }
             @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
             @keyframes draw-cross { to { opacity: 1; } }
-
-            .card-header .icon, .card-header .title, .card-header .message { stroke: white; color: white; }
+            
+            .password-icon {
+                filter: drop-shadow(0 0 8px var(--password-icon-glow));
+                transition: filter 0.3s ease;
+            }
             .title {
                 font-size: 26px;
                 font-weight: 800;
@@ -221,6 +237,7 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             }
             .ticket-header .title { color: var(--text-primary); }
             .ticket-header .message { color: var(--text-secondary); }
+            .card-header .title, .card-header .message { color: var(--text-primary); }
 
             .player-name {
                 font-size: 22px;
@@ -283,9 +300,9 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             .password-form input {
                 width: 100%;
                 padding: 15px;
-                border-radius: 10px;
+                border-radius: 50px; /* Pill shape */
                 border: 2px solid var(--border-color);
-                background-color: var(--details-bg);
+                background-color: transparent;
                 color: var(--text-primary);
                 text-align: center;
                 font-size: 18px;
@@ -295,23 +312,27 @@ const generateHtmlResponse = (status, title, message, details = null, token = nu
             .password-form input:focus {
                 outline: none;
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); /* Blue ring */
+                box-shadow: 0 0 0 3px var(--password-border-glow);
             }
             .password-form button {
                 width: 100%;
                 padding: 15px;
                 border: none;
-                border-radius: 10px;
-                background-color: var(--primary-color);
+                border-radius: 50px; /* Pill shape */
+                background: linear-gradient(90deg, var(--password-color), var(--password-color-dark));
                 color: white;
                 font-size: 18px;
                 font-weight: 800;
                 cursor: pointer;
-                transition: transform 0.2s, box-shadow 0.2s;
+                transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
             }
             .password-form button:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); /* Blue shadow */
+                box-shadow: 0 8px 20px var(--password-border-glow);
+            }
+            .password-form button:active {
+                transform: translateY(2px);
+                box-shadow: 0 2px 5px var(--password-border-glow);
             }
         </style>
     </head>
@@ -383,14 +404,16 @@ app.post('/redeem', async (req, res) => {
         const entryData = entryDoc.data();
 
         if (!entryData.isRedeemed) {
-            const redemptionTime = new Date();
+            const redemptionTime = admin.firestore.FieldValue.serverTimestamp();
             
             await entryDoc.ref.update({ 
                 isRedeemed: true,
                 redeemedAt: redemptionTime 
             });
             
-            const formattedTime = redemptionTime.toLocaleString('en-GB', {
+            const updatedEntryDoc = await entryDoc.ref.get();
+            const updatedEntryData = updatedEntryDoc.data();
+            const formattedTime = updatedEntryData.redeemedAt.toDate().toLocaleString('en-GB', {
                 day: 'numeric', month: 'short', year: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             });
